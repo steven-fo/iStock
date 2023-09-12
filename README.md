@@ -1,5 +1,5 @@
-Nama: Steven Faustin Orginata
-Kelas: PBP C
+Nama: Steven Faustin Orginata <br>
+Kelas: PBP C <br>
 NPM: 2206030855
 
 Tugas 2 PBP Ganjil 2023/2024
