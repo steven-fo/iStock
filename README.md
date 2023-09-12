@@ -8,7 +8,7 @@ Tugas 2 PBP Ganjil 2023/2024
 
 iStock adalah sebuah aplikasi untuk mengukur/mengecek stok pada toko.
 <br>
-Link: [Adaptable]()
+Link: [Adaptable](https://istock.adaptable.app/)
 
 =================================================
 
