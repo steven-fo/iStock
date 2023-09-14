@@ -11,7 +11,7 @@ from django.core import serializers
 def show_main(request):
     item = Item.objects.all()
     context = {
-        'name': 'Barang 1',
+        'name': 'Steven Faustin Orginata',
         'class': 'PBP C',
         'items': item
     }
