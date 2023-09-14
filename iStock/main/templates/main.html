@@ -8,4 +8,32 @@
     <p>{{name}}</p>
     <h4>Class:</h4>
     <p>{{class}}</p>
+    <br>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Date Added</th>
+        </tr>
+
+        {% for item in items %}
+        <tr>
+            <td>{{item.name}}</td>
+            <td>{{item.amount}}</td>
+            <td>{{item.type}}</td>
+            <td>{{item.description}}</td>
+            <td>{{item.date_added}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+
+    <a href="{% url 'main:create_item' %}">
+        <button>
+            Add New Item
+        </button>
+    </a>
 {% endblock content %}
