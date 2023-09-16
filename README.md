@@ -131,3 +131,185 @@ Menurut saya, virtual environment berguna untuk menjalankan program/aplikasi web
   MVVM berfokus pada menampilkan dan menerima data. <br>
 
 <hr>
+
+<h2>Tugas 3 PBP Ganjil 2023/2024</h2>
+
+* Apa perbedaan antara form POST dan form GET dalam Django?
+* Apa perbedaan utama antara XML, JSON, dan HTML dalam konteks pengiriman data?
+* Mengapa JSON sering digunakan dalam pertukaran data antara aplikasi web modern?
+* Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
+
+<hr>
+
+<h4>Apa perbedaan antara form POST dan form GET dalam Django?</h4>
+Query POST dan GET berbeda dari request ke server. Query POST, sesuai namanya, yaitu memasukkan data ke server. Pada saat kita mengisi form dan mengklik tombol add item, kita melakukan query POST ke server untuk menyimpan data tersebut di server. Query GET, sesuai namanya, yaitu mengambil data dari server. Pada saat kita men-display data ada berapa item, kita melakukan query GET ke server untuk mendapatkan data tersebut kemudian data tersebut di display.
+<br>
+
+<h4>Apa perbedaan utama antara XML, JSON, dan HTML dalam konteks pengiriman data</h4>
+
+* XML: menyimpan/mengirimkan data dalam urutan/hierarki root / parent dan child.
+* JSON: menyimpan/mengirimkan data dalam bentuk yang lebih mudah dibaca
+* HTML: bukan untuk menyimpan/mengirimkan data. HTML dipakai untuk membuat tampilan web. Data dikirimkan dalam bentuk webpage.
+
+<h4>Mengapa JSON sering digunakan dalam pertukaran data antara aplikasi web modern</h4>
+JSON sering digunakan karena struktur / format yang mudah dibaca. 
+
+<h4>Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
+</h4>
+Sebelum membuat form, saya membuat file base.html untuk menjadi template html webpage berikut"nya.
+
+  ```
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+        />
+        {% block meta %}
+        {% endblock meta %}
+    </head>
+
+    <body>
+        {% block content %}
+        {% endblock content %}
+    </body>
+</html>
+
+{% comment %} file ini sebagai skeleton/template untuk halaman page lainnya {% endcomment %}
+  ```
+
+Setelah membuat template, saya memasukkan template ke settings.py bagian template, DIRS
+
+    TEMPLATES = [
+      {
+          'BACKEND': 'django.template.backends.django.DjangoTemplates',
+          'DIRS': [BASE_DIR / 'templates'],
+          'APP_DIRS': True,
+          'OPTIONS': {
+              'context_processors': [
+                  'django.template.context_processors.debug',
+                  'django.template.context_processors.request',
+                  'django.contrib.auth.context_processors.auth',
+                  'django.contrib.messages.context_processors.messages',
+              ],
+          },
+      },
+    ]
+  
+
+Kemudian, saya menambahkan button ke form dan table untuk mendisplay data
+
+        <h4>Kamu menyimpan {{items.count}} item pada aplikasi ini</h4>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Date Added</th>
+        </tr>
+
+        {% for item in items %}
+        <tr>
+            <td>{{item.name}}</td>
+            <td>{{item.amount}}</td>
+            <td>{{item.type}}</td>
+            <td>{{item.description}}</td>
+            <td>{{item.date_added}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+
+    <a href="{% url 'main:create_item' %}">
+        <button>
+            Add New Item
+        </button>
+    </a>
+
+Bisa dilihat di link button, dia akan redirect ke create_item page. Maka, saya perlu membuat create_item.html.
+
+    {% extends 'base.html' %}
+
+    {% block content %}
+    <h1>Add New Item</h1>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <table>
+            {{form.as_table}}
+            <tr>
+                <td></td>
+                <td>
+                    <input type="submit" value="Add Item"/>
+                </td>
+            </tr>
+        </table>
+    </form>
+    
+    
+    {% endblock content %}
+
+Selanjutnya, saya membuat function untuk mendisplay create_item di views.py
+
+    def create_item(request):
+    form = ItemForm(request.POST or None)
+
+    if form.is_valid() and request.method == "POST":
+        form.save()
+        return HttpResponseRedirect(reverse('main:show_main'))
+
+    context = {'form': form}
+    return render(request, "create_item.html", context) 
+
+Dari views ini lanjut ke urls.py untuk melakukan routing
+
+    urlpatterns = [
+    path('', show_main, name='show_main'),
+    path('create-item', create_item, name="create_item"),
+    ]
+
+Selanjutnya, untuk membuat 5 fungsi views, saya membuat fungsi di views.py
+
+    def show_html(request):
+    data = Item.objects.all()
+    return HttpResponse(serializers.serialize("html", data), content_type="application/html")
+
+    def show_xml(request):
+        data = Item.objects.all()
+        return HttpResponse(serializers.serialize("xml", data), content_type="application/xml")
+    
+    def show_json(request):
+        data = Item.objects.all()
+        return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+    
+    def show_xml_by_id(request, id):
+        data = Item.objects.filter(pk=id)
+        return HttpResponse(serializers.serialize("xml", data), content_type="application/xml")
+    
+    def show_json_by_id(request, id):
+        data = Item.objects.filter(pk=id)
+        return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+
+Dengan langkah yang sama seperti create_item, saya membuat routing function tersebut di urls.py
+
+    urlpatterns = [
+    path('', show_main, name='show_main'),
+    path('create-item', create_item, name="create_item"),
+    path('html/', show_html, name="show_html"),
+    path('xml/', show_xml, name="show_xml"),
+    path('json/', show_json, name="show_json"),
+    path('xml/<int:id>/', show_xml_by_id, name="show_xml_by_id"),
+    path('json/<int:id>/', show_json_by_id, name="show_json_by_id"),
+    ]
+
+=================================================
+
+<h4>Screenshoot Postman</h4>
+
+
+<hr>
