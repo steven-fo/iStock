@@ -311,5 +311,20 @@ Dengan langkah yang sama seperti create_item, saya membuat routing function ters
 
 <h4>Screenshoot Postman</h4>
 
+<h5>Mengakses http://localhost:8000/json</h5>
+![json](https://github.com/steven-fo/iStock/assets/119484321/de695a66-67ef-4f36-ae9c-baefe3aa9e51)
+
+<h5>Mengakses http://localhost:8000/xml</h5>
+![xml](https://github.com/steven-fo/iStock/assets/119484321/b4b9304c-0eb5-4849-81d8-d5a82f2614d1)
+
+<h5>Mengakses http://localhost:8000/html</h5>
+![HTML](https://github.com/steven-fo/iStock/assets/119484321/2a878155-e1e0-47e4-a83b-ab78a7de4284)
+![html](https://github.com/steven-fo/iStock/assets/119484321/2bbd981d-f9b2-48fd-af6c-e457ce1b41d9)
+
+<h5>Mengakses http://localhost:8000/json/1</h5>
+![json_id](https://github.com/steven-fo/iStock/assets/119484321/1a772f6c-e1f0-4179-8ba8-87dab09d26dc)
+
+<h5>Mengakses http://localhost:8000/xml/1</h5>
+![xml_id](https://github.com/steven-fo/iStock/assets/119484321/2501b831-3949-40f3-8b94-e6cf123899b6)
 
 <hr>
