@@ -30,7 +30,10 @@ def create_item(request):
 
 def show_html(request):
     data = Item.objects.all()
-    return HttpResponse(serializers.serialize("html", data), content_type="application/html")
+    context = {
+        'items': data
+    }
+    return render(request, "items.html", context)
 
 def show_xml(request):
     data = Item.objects.all()
