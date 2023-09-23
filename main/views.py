@@ -13,9 +13,9 @@ from django.contrib.auth.decorators import login_required
 
 @login_required(login_url='/login')
 def show_main(request):
-    item = Item.objects.all()
+    item = Item.objects.filter(user=request.user)
     context = {
-        'name': 'Steven Faustin Orginata',
+        'name': request.user.username,
         'class': 'PBP C',
         'items': item,
         'last_login': request.COOKIES['last_login']
@@ -27,7 +27,9 @@ def create_item(request):
     form = ItemForm(request.POST or None)
 
     if form.is_valid() and request.method == "POST":
-        form.save()
+        item = form.save(commit=False)
+        item.user = request.user
+        item.save()
         return HttpResponseRedirect(reverse('main:show_main'))
 
     context = {'form': form}
