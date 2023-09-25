@@ -17,15 +17,34 @@
             <th>Type</th>
             <th>Description</th>
             <th>Date Added</th>
+            <th></th>
         </tr>
 
         {% for item in items %}
         <tr>
             <td>{{item.name}}</td>
-            <td>{{item.amount}}</td>
+            <td>
+                <span>
+                    <form action="{% url 'main:sub_amount' item.name %}" method="post">
+                        {% csrf_token %}
+                        <input id="sub_button" type="submit" value="-"/>
+                    </form>
+                {{item.amount}}
+                    <form action="{% url 'main:add_amount' item.name %}" method="post">
+                        {% csrf_token %}
+                        <input id="add_button" type="submit" value="+" />
+                    </form>
+                </span>
+            </td>
             <td>{{item.type}}</td>
             <td>{{item.description}}</td>
             <td>{{item.date_added}}</td>
+            <td>
+                <form action="{% url 'main:delete_item' item.name %}" method="post">
+                    {% csrf_token %}
+                    <button id="delete_button" type="submit">Delete</button>
+                </form>
+            </td>
         </tr>
         {% endfor %}
     </table>
@@ -45,4 +64,9 @@
 
     <h5>Sesi terakhir login: {{ last_login }}</h5>
 
+    <script>
+        function addAmount() {
+            
+        }
+    </script>
 {% endblock content %}

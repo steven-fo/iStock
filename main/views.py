@@ -90,3 +90,20 @@ def logout_user(request):
     response = HttpResponseRedirect(reverse("main:login"))
     response.delete_cookie('last_login')
     return redirect('main:login')
+
+def add_amount(request, item_name):
+    item = Item.objects.get(name=item_name)
+    item.amount += 1
+    item.save()
+    return redirect('/')
+
+def sub_amount(request, item_name):
+    item = Item.objects.get(name=item_name)
+    item.amount -= 1
+    item.save()
+    return redirect('/')
+
+def delete_item(request, item_name):
+    item = Item.objects.get(name=item_name)
+    item.delete()
+    return redirect('/')
