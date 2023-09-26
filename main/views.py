@@ -98,7 +98,10 @@ def add_amount(request, item_name):
 
 def sub_amount(request, item_name):
     item = Item.objects.get(name=item_name)
-    item.amount -= 1
+    if item.amount == 0:
+        item.amount = 0
+    else:
+        item.amount -= 1
     item.save()
     return redirect('/')
 

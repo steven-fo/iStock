@@ -25,12 +25,12 @@
             <td>{{item.name}}</td>
             <td>
                 <span>
-                    <form action="{% url 'main:sub_amount' item.name %}" method="post">
+                    <form action="{% url 'main:sub_amount' item.name %}" method="post" style="display: inline;">
                         {% csrf_token %}
                         <input id="sub_button" type="submit" value="-"/>
                     </form>
                 {{item.amount}}
-                    <form action="{% url 'main:add_amount' item.name %}" method="post">
+                    <form action="{% url 'main:add_amount' item.name %}" method="post" style="display: inline;">
                         {% csrf_token %}
                         <input id="add_button" type="submit" value="+" />
                     </form>
