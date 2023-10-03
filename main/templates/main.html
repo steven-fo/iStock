@@ -1,66 +1,57 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>iStock</h1>
-    <h3>Your Go-To Stock Management App</h3>
-    <br>
-    <h4>Name:</h4>
-    <p>{{name}}</p>
-    <h4>Class:</h4>
-    <p>{{class}}</p>
-    <br>
-    <h4>Kamu menyimpan {{items.count}} item pada aplikasi ini</h4>
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Amount</th>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Date Added</th>
-            <th></th>
-        </tr>
+    <div class="py-2 mx-4 text-center">
+        <h1>iStock</h1>
+        <h3>Your Go-To Stock Management App</h3>
+        <br>
+        <h4>Name:</h4>
+        <p>{{name}}</p>
+        <h4>Class:</h4>
+        <p>{{class}}</p>
+        <br>
+        <h6>Kamu menyimpan {{items.count}} item pada aplikasi ini</h6>
+        <br>
 
-        {% for item in items %}
-        <tr>
-            <td>{{item.name}}</td>
-            <td>
-                <span>
+        <a href="{% url 'main:create_item' %}">
+            <button>
+                Add New Item
+            </button>
+        </a>
+        <a href="{% url 'main:logout' %}">
+            <button>
+                Logout
+            </button>
+        </a>
+
+        <div class="card-container row justify-content-md-center"> 
+            {% for item in items %}
+            <div class="card col col-lg-4 mx-5 my-3" style="width: 18rem;">
+                <img src="..." class="card-img-top" alt="Gambar belum ada">
+                <div class="card-body">
+                    <h5 class="card-title">{{item.name}}</h5>
+                    <p>Amount:</p>
                     <form action="{% url 'main:sub_amount' item.name %}" method="post" style="display: inline;">
                         {% csrf_token %}
-                        <input id="sub_button" type="submit" value="-"/>
+                        <input id="sub_button" type="submit" value="-" class=""/>
                     </form>
-                {{item.amount}}
+                    {{item.amount}}
                     <form action="{% url 'main:add_amount' item.name %}" method="post" style="display: inline;">
                         {% csrf_token %}
                         <input id="add_button" type="submit" value="+" />
                     </form>
-                </span>
-            </td>
-            <td>{{item.type}}</td>
-            <td>{{item.description}}</td>
-            <td>{{item.date_added}}</td>
-            <td>
-                <form action="{% url 'main:delete_item' item.name %}" method="post">
-                    {% csrf_token %}
-                    <button id="delete_button" type="submit">Delete</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-
-    <br>
-
-    <a href="{% url 'main:create_item' %}">
-        <button>
-            Add New Item
-        </button>
-    </a>
-    <a href="{% url 'main:logout' %}">
-        <button>
-            Logout
-        </button>
-    </a>
-
-    <h5>Sesi terakhir login: {{ last_login }}</h5>
+                    <p class="card-text mt-3">Type: {{item.type}}</p>
+                    <p class="card-text">{{item.description}}</p>
+                    <form action="{% url 'main:delete_item' item.name %}" method="post">
+                        {% csrf_token %}
+                        <button id="delete_button" type="submit">Delete</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <p>
+        Sesi terakhir login: {{ last_login }}
+        </p>
+    </div>
 {% endblock content %}

@@ -584,3 +584,103 @@ Kemudian, kita masukkan data last_login ke main.html agar bisa dilihat
 ```
 
 <hr>
+
+<h2>Tugas 5 PBP Ganjil 2023/2024</h2>
+
+* Jelaskan manfaat dari setiap element selector dan kapan waktu yang tepat untuk menggunakannya.
+* Jelaskan HTML5 Tag yang kamu ketahui.
+* Jelaskan perbedaan antara margin dan padding.
+* Jelaskan perbedaan antara framework CSS Tailwind dan Bootstrap. Kapan sebaiknya kita menggunakan Bootstrap daripada Tailwind, dan sebaliknya?
+* Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
+
+<hr>
+
+<h4>Jelaskan manfaat dari setiap element selector dan kapan waktu yang tepat untuk menggunakannya.</h4>
+Element selector pada dasarnya melakukan styling pada tags HTML tertentu. Misalnya, kita ingin memberikan warna font untuk semua tags h4 di suatu dokumen HTML. Maka, di file CSS akan ada kode seperti berikut:
+
+```
+h4 {
+    text-color: 'green';
+}
+```
+Terdapat berbagai macam cara untuk men-select tags yang ingin dimodif. Cara paling biasa adalah menulis tags yang kita mau modif. Namun, bagaimana kalau kita hanya mau memodif tag h4 yang ada di dalam tag lain? Ada aturan untuk melakukan styling untuk tag tertentu.
+![aturan_css](images/aturan_css.png)
+
+<h4>Jelaskan HTML5 Tag yang kamu ketahui.</h4>
+Terdapat banyak sekali tag HTML yang ada. Pada project ini, yang saya ingat ada tag sebagai berikut:
+
+* html: tag untuk mendeklarasikan file html
+* head: tag untuk mendeklarasikan header suatu file html. Biasa diisi dengan styleshee atau settings atau script
+* body: tag untuk menyimpan isi dari konten HTML yang mau di-display
+* h1-h6: tag untuk membuat header, font akan menjadi bold
+* p: tag untuk menyimpan teks
+* div: tag untuk memisahkan/mengelompokkan tag-tag yang lain
+* table: tag untuk membuat table
+* tr: tag untuk membuat baris pada tabel
+* th: tag untuk membuat kolom (header) pada tabel
+* td: tag untuk mendisplay pada tabel
+* form: tag untuk membuat form
+* input: tag untuk menyimpan/menerima input user
+* button: tag yang berperan sebagai button
+
+<h4>Jelaskan perbedaan antara margin dan padding.</h4>
+Margin memisahkan / memberi jarak konten dengan ujung-ujung ukuran konten tersebut.
+Padding untuk memberi jarak dari border yang dimiliki konten
+Lebih jelasnya bisa dilihat di gambar berikut:
+
+![box_model](images/box_model.png)
+
+<h4>Jelaskan perbedaan antara framework CSS Tailwind dan Bootstrap. Kapan sebaiknya kita menggunakan Bootstrap daripada Tailwind, dan sebaliknya?</h4>
+Secara garis besar, bootstrap menawarkan tampilan yang sudah jadi/didefinisikan jadi developer tinggal langsung memakai. Tailwind, menawarkan kesempatan pada developer untuk melakukan modifikasi pada komponen sesuai keinginan developer. Menurut saya, jika kita ingin tampilan yang langsung jadi, bootstrap lebih unggul dibandingkan tailwind. Tetapi, jika kita ingin tampilan yang lebih bebas, lebih kreatif, tailwind solusinya. Selain itu, faktor kemudahan untuk dipelajari juga patut diperhatikan. Bootstrap tergolong beginner-friendly karena developer tinggal langsung pakai ketimbang tailwind.
+
+<h4>Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).</h4>
+Pertama, saya memasukkan bootstrap ke base.html
+
+```
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-KyZXEAg3QhqLMpG8r+J4jsl5c9zdLKaUk5Ae5f5b1bw6AUn5f5v8FZJoMxm6f5cH1" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+```
+Jika sudah memasukkan bootstrap, kita hanya perlu membaca dokumentasi untuk styling yang kita inginkan. Contoh, untuk memperbagus tampilan saat login, saya menerapkan margin agar konten tidak menempel pada sisi atas browser.
+```
+<div class="login mx-0 my-5 text-center">
+
+    <h1>Login</h1>
+
+    <div class="py-2">
+    ...
+```
+Selain itu, untuk menampilkan inventori, saya menggunakan tampilan Card yang sudah disediakan oleh Bootstrap.
+```
+<div class="card-container row justify-content-md-center"> 
+    {% for item in items %}
+    <div class="card col col-lg-4 mx-5 my-3" style="width: 18rem;">
+        <img src="..." class="card-img-top" alt="Gambar belum ada">
+        <div class="card-body">
+            <h5 class="card-title">{{item.name}}</h5>
+            <p>Amount:</p>
+            <form action="{% url 'main:sub_amount' item.name %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <input id="sub_button" type="submit" value="-" class=""/>
+            </form>
+            {{item.amount}}
+            <form action="{% url 'main:add_amount' item.name %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <input id="add_button" type="submit" value="+" />
+            </form>
+            <p class="card-text mt-3">Type: {{item.type}}</p>
+            <p class="card-text">{{item.description}}</p>
+            <form action="{% url 'main:delete_item' item.name %}" method="post">
+                {% csrf_token %}
+                <button id="delete_button" type="submit">Delete</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+```
+<hr>
