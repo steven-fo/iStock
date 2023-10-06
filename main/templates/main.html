@@ -64,15 +64,67 @@
         <h6>Kamu menyimpan {{items.count}} item pada aplikasi ini</h6>
         <br>
 
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Product by AJAX</button>
         <a href="{% url 'main:create_item' %}">
             <button class="mb-5">
                 Add New Item
             </button>
         </a>
 
-        <div class="card-container row justify-content-md-center"> 
-            {% for item in items %}
-            <div class="card col col-lg-4 mx-5 my-3 " style="width: 18rem;">
+        <div class="card-container row justify-content-md-center text-center"> 
+
+        </div>
+        <p class="mt-5">
+        Sesi terakhir login: {{ last_login }}
+        </p>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Item</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <form id="form" onsubmit="return false;">
+                      {% csrf_token %}
+                      <div class="mb-3">
+                          <label for="name" class="col-form-label">Name:</label>
+                          <input type="text" class="form-control" id="name" name="name"></input>
+                      </div>
+                      <div class="mb-3">
+                          <label for="price" class="col-form-label">Amount:</label>
+                          <input type="number" class="form-control" id="price" name="price"></input>
+                      </div>
+                      <div class="mb-3">
+                        <label for="type" class="col-form-label">Type:</label>
+                        <input type="text" class="form-control" id="type" name="type"></input>
+                      </div>
+                      <div class="mb-3">
+                          <label for="description" class="col-form-label">Description:</label>
+                          <textarea class="form-control" id="description" name="description"></textarea>
+                      </div>
+                  </form>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal">Add Product</button>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <script>
+      async function getItems() {
+        return fetch("{% url 'main:get_item_json' %}").then((res) => res.json())
+      }
+
+      async function refreshItems() {
+        document.getElementById("card-container").innerHTML = ""
+        const items = await getItems()
+        items.forEach((item) => {
+          htmlString = `<div class="card col col-lg-4 mx-5 my-3" style="width: 18rem;">
                 <img src="..." class="card-img-top" alt="Gambar belum ada">
                 <div class="card-body">
                     <h5 class="card-title">{{item.name}}</h5>
@@ -89,16 +141,21 @@
                     <p class="card-text mt-3">Type: {{item.type}}</p>
                     <p class="card-text">{{item.description}}</p>
                     <p class="card-text">Date added: {{item.date_added}}</p>
-                    <form action="{% url 'main:delete_item' item.name %}" method="post">
+                    <a href="{% url 'main:edit_item' item.pk %}">
+                      <button>
+                        Edit
+                      </button>
+                    </a>
+                    <form action="{% url 'main:delete_item' item.name %}" method="post" style="display: inline;">
                         {% csrf_token %}
                         <button id="delete_button" type="submit">Delete</button>
                     </form>
                 </div>
-            </div>
-            {% endfor %}
-        </div>
-        <p class="mt-5">
-        Sesi terakhir login: {{ last_login }}
-        </p>
-    </div>
+            </div>`
+        })
+        document.getElementById("card-container").innerHTML = htmlString;
+      }
+
+      refreshItems()
+    </script>
 {% endblock content %}
