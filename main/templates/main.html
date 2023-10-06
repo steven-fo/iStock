@@ -65,7 +65,7 @@
         <br>
 
         <a href="{% url 'main:create_item' %}">
-            <button>
+            <button class="mb-5">
                 Add New Item
             </button>
         </a>
@@ -88,6 +88,7 @@
                     </form>
                     <p class="card-text mt-3">Type: {{item.type}}</p>
                     <p class="card-text">{{item.description}}</p>
+                    <p class="card-text">Date added: {{item.date_added}}</p>
                     <form action="{% url 'main:delete_item' item.name %}" method="post">
                         {% csrf_token %}
                         <button id="delete_button" type="submit">Delete</button>
@@ -96,7 +97,7 @@
             </div>
             {% endfor %}
         </div>
-        <p>
+        <p class="mt-5">
         Sesi terakhir login: {{ last_login }}
         </p>
     </div>
