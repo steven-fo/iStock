@@ -91,14 +91,14 @@ def logout_user(request):
     response.delete_cookie('last_login')
     return redirect('main:login')
 
-def add_amount(request, item_name):
-    item = Item.objects.get(name=item_name)
+def add_amount(request, id):
+    item = Item.objects.get(pk = id)
     item.amount += 1
     item.save()
     return redirect('/')
 
-def sub_amount(request, item_name):
-    item = Item.objects.get(name=item_name)
+def sub_amount(request, id):
+    item = Item.objects.get(pk = id)
     if item.amount == 0:
         item.amount = 0
     else:
@@ -106,8 +106,8 @@ def sub_amount(request, item_name):
     item.save()
     return redirect('/')
 
-def delete_item(request, item_name):
-    item = Item.objects.get(name=item_name)
+def delete_item(request, id):
+    item = Item.objects.get(pk = id)
     item.delete()
     return redirect('/')
 
@@ -140,4 +140,12 @@ def add_item_ajax(request):
 
         return HttpResponse(b"CREATED", status=201)
     
+    return HttpResponseNotFound()
+
+@csrf_exempt
+def delete_item_ajax(request, id):
+    if request.method == 'DELETE':
+        item = Item.objects.get(pk=id)
+        item.delete()
+        return HttpResponse(b"DELETED", status=200)
     return HttpResponseNotFound()

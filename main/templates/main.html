@@ -64,16 +64,17 @@
         <h6>Kamu menyimpan {{items.count}} item pada aplikasi ini</h6>
         <br>
 
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Product by AJAX</button>
-        <a href="{% url 'main:create_item' %}">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Item by AJAX</button>
+        <!-- <a href="{% url 'main:create_item' %}">
             <button class="mb-5">
                 Add New Item
             </button>
-        </a>
+        </a> -->
 
         <div class="card-container row justify-content-md-center text-center"> 
 
         </div>
+
         <p class="mt-5">
         Sesi terakhir login: {{ last_login }}
         </p>
@@ -124,17 +125,17 @@
         document.getElementById("card-container").innerHTML = ""
         const items = await getItems()
         items.forEach((item) => {
-          htmlString = `<div class="card col col-lg-4 mx-5 my-3" style="width: 18rem;">
+          htmlString = `\n<div class="card col col-lg-4 mx-5 my-3" style="width: 18rem;">
                 <img src="..." class="card-img-top" alt="Gambar belum ada">
                 <div class="card-body">
                     <h5 class="card-title">{{item.name}}</h5>
                     <p>Amount:</p>
-                    <form action="{% url 'main:sub_amount' item.name %}" method="post" style="display: inline;">
+                    <form action="{% url 'main:sub_amount' item.pk %}" method="post" style="display: inline;">
                         {% csrf_token %}
                         <input id="sub_button" type="submit" value="-" class=""/>
                     </form>
                     {{item.amount}}
-                    <form action="{% url 'main:add_amount' item.name %}" method="post" style="display: inline;">
+                    <form action="{% url 'main:add_amount' item.pk %}" method="post" style="display: inline;">
                         {% csrf_token %}
                         <input id="add_button" type="submit" value="+" />
                     </form>
@@ -146,10 +147,11 @@
                         Edit
                       </button>
                     </a>
-                    <form action="{% url 'main:delete_item' item.name %}" method="post" style="display: inline;">
+                    <form action="{% url 'main:delete_item' item.pk %}" method="post" style="display: inline;">
                         {% csrf_token %}
                         <button id="delete_button" type="submit">Delete</button>
                     </form>
+                    <button type="button" class="btn btn-primary" id="button_delete">Delete Item by AJAX</button>
                 </div>
             </div>`
         })
@@ -157,5 +159,25 @@
       }
 
       refreshItems()
+
+      function addItem() {
+        fetch("{% url 'main:add_item_ajax' %}", {
+          method: 'POST',
+          body: new FormData(document.querySelector('#form'))
+        }).then(refreshItems)
+
+        document.getElementById("form").reset()
+        return false
+      }
+
+      function deleteItem() {
+        fetch("{% url 'main:delete_item_ajax' item.pk %}", {
+          method:'DELETE'
+        }).then(refreshItems)
+        return false
+      }
+
+      document.getElementById("button_add").onclick = addItem
+      document.getElementById("button_delete").onclick = deleteItem
     </script>
 {% endblock content %}
