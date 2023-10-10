@@ -683,4 +683,193 @@ Selain itu, untuk menampilkan inventori, saya menggunakan tampilan Card yang sud
     {% endfor %}
 </div>
 ```
+
+<hr>
+
+<h2>Tugas 6 PBP Ganjil 2023/2024</h2>
+
+* Jelaskan perbedaan antara asynchronous programming dengan synchronous programming.
+* Dalam penerapan JavaScript dan AJAX, terdapat penerapan paradigma event-driven programming. Jelaskan maksud dari paradigma tersebut dan sebutkan salah satu contoh penerapannya pada tugas ini.
+* Jelaskan penerapan asynchronous programming pada AJAX.
+* Pada PBP kali ini, penerapan AJAX dilakukan dengan menggunakan Fetch API daripada library jQuery. Bandingkanlah kedua teknologi tersebut dan tuliskan pendapat kamu teknologi manakah yang lebih baik untuk digunakan.
+* Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).
+
+<hr>
+
+<h4>Jelaskan perbedaan antara asynchronous programming dengan synchronous programming.</h4>
+Synchronous programming adalah cara dimana kode dieksekusi secara terurut dari atas ke bawah. Kode yang dibawah akan menunggu kode diatasnya selesai dieksekusi. Asynchronous programming adalah cara yang berkebalikan dengan synchronous programming. Kode pada asynchronous programming tidak bergantung pada kode lain. Maksudnya, kode yang dibawah tidak harus menunggu kode diatasnya sampai selesai. Kode dibawah bisa dieksekusi meskipun kode atas belum selesai.
+
+<h4>Dalam penerapan JavaScript dan AJAX, terdapat penerapan paradigma event-driven programming. Jelaskan maksud dari paradigma tersebut dan sebutkan salah satu contoh penerapannya pada tugas ini.</h4>
+Sesuai namanya, event-driven programming adalah paradigma dimana kode berjalan sesuai event yang terjadi, seperti input user, notifikasi, click button, dll. Pada tugas ini, event-driven programming diimplementasi menggunakan button. Button tersebut contohnya, add amount, sub amount, edit item, delete item, add item, login, logout, dll.
+
+<h4>Jelaskan penerapan asynchronous programming pada AJAX.</h4>
+Pada AJAX ada beberapa penerapan asynchronous programming seperti, penggunaan XMLHttpRequest (callback), fetch API (promise), dan fetch API (async/await). Callback berjalan secara asinkronus dimana kode tidak akan menunggu kode sebelumnya selesai, tetapi ia akan mengeksekusi kode berikutnya. Ketika kode sebelumnya sudah selesai, fungsi callback akan dipanggil. Promise bekerja mirip seperti callback, bedanya promise memberikan cara yang lebih terstruktur dan mudah. Async/await membuat kode asynchronous menjadi mirip kode synchronous dalam tahap eksekusinya. 
+
+<h4>Pada PBP kali ini, penerapan AJAX dilakukan dengan menggunakan Fetch API daripada library jQuery. Bandingkanlah kedua teknologi tersebut dan tuliskan pendapat kamu teknologi manakah yang lebih baik untuk digunakan.</h4>
+Jika kita ingin membuat web dengan versi yang lebih modern, fetch API lebih cocok untuk digunakan. Sebaliknya, jQuery cocok digunakan untuk web versi yang lebih lama. Jika kita menggunakan request yang tidak kompleks, fetch API lebih cocok untuk digunakan. Sebaliknya, jQuery cocok digunakan jika kita ingin menggunakan request yang lebih kompleks.
+
+<h4>Jelaskan bagaimana cara kamu mengimplementasikan checklist di atas secara step-by-step (bukan hanya sekadar mengikuti tutorial).</h4>
+Untuk mengubah kode menggunakan AJAX GET, saya membuat fungsi get_item_json di views.py untuk mengambil semua item
+
+```
+def get_item_json(request):
+    item = Item.objects.all()
+    return HttpResponse(serializers.serialize('json', item))
+```
+
+Setelah itu, saya me-route fungsi ini di urls.py
+```
+path('get-item/', get_item_json, name='get_item_json')
+```
+
+Kemudian, di main.html saya menambahkan script pada bagian sebelum endblock content
+```
+...
+    <script>
+        async function getItems() {
+            return fetch("{% url 'main:get_item_json' %}").then((res) => res.json())
+        }
+    </script>
+{% endblock content %}
+```
+
+Dibawah function getItems tersebut, saya membuat fungsi refreshItems agar user tidak perlu me-refresh pagenya setiap kali ada perubahan
+```
+      async function refreshItems() {
+        document.getElementById("card-container").innerHTML = ""
+        const items = await getItems()
+        items.forEach((item) => {
+          htmlString = `\n<div class="card col col-lg-4 mx-5 my-3" style="width: 18rem;">
+                <img src="..." class="card-img-top" alt="Gambar belum ada">
+                <div class="card-body">
+                    <h5 class="card-title">{{item.name}}</h5>
+                    <p>Amount:</p>
+                    <form action="{% url 'main:sub_amount' ${item.pk} %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input id="sub_button" type="submit" value="-" class=""/>
+                    </form>
+                    {{item.amount}}
+                    <form action="{% url 'main:add_amount' ${item.pk} %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input id="add_button" type="submit" value="+" />
+                    </form>
+                    <p class="card-text mt-3">Type: {{item.type}}</p>
+                    <p class="card-text">{{item.description}}</p>
+                    <p class="card-text">Date added: {{item.date_added}}</p>
+                    <a href="{% url 'main:edit_item' ${item.pk} %}">
+                      <button>
+                        Edit
+                      </button>
+                    </a>
+                    <form action="{% url 'main:delete_item' ${item.pk} %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button id="delete_button" type="submit">Delete</button>
+                    </form>
+                    <button type="button" class="btn btn-primary" id="button_delete">Delete Item by AJAX</button>
+                </div>
+            </div>`
+        })
+        document.getElementById("card-container").innerHTML = htmlString;
+      }
+
+      refreshItems()
+```
+Kemudian saya hapus isi dari card di main.html karena akan di-generate oleh fungsi refreshItems.
+<br>
+<br>
+
+Untuk AJAX POST, pertama untuk membuat tombol menambahkan item, saya menambahkan kode berikut
+```
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Item</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <form id="form" onsubmit="return false;">
+                      {% csrf_token %}
+                      <div class="mb-3">
+                          <label for="name" class="col-form-label">Name:</label>
+                          <input type="text" class="form-control" id="name" name="name"></input>
+                      </div>
+                      <div class="mb-3">
+                          <label for="price" class="col-form-label">Amount:</label>
+                          <input type="number" class="form-control" id="price" name="price"></input>
+                      </div>
+                      <div class="mb-3">
+                        <label for="type" class="col-form-label">Type:</label>
+                        <input type="text" class="form-control" id="type" name="type"></input>
+                      </div>
+                      <div class="mb-3">
+                          <label for="description" class="col-form-label">Description:</label>
+                          <textarea class="form-control" id="description" name="description"></textarea>
+                      </div>
+                  </form>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal">Add Product</button>
+              </div>
+          </div>
+      </div>
+    </div>
+```
+Kode di atas merupakan modal yang akan terbuka ketika button dipencet. Untuk membuat button tersebut, saya menambahkan kode:
+```
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+Add Item by AJAX
+</button>
+```
+
+Kemudian, di views, saya membuat fungsi untuk menambahkan item ke database
+```
+@csrf_exempt
+def add_item_ajax(request):
+    if request.method == 'POST':
+        name = request.POST.get("name")
+        amount = request.POST.get("amount")
+        type = request.POST.get("type")
+        description = request.POST.get("description")
+        user = request.user
+    
+        new_item = Item(name=name, amount=amount, type=type, description=description, user=user)
+        new_item.save()
+
+        return HttpResponse(b"CREATED", status=201)
+    
+    return HttpResponseNotFound()
+```
+
+Fungsi ini kemudian di route di urls.py
+```
+...
+    path('create-item-ajax/', add_item_ajax, name='add_item_ajax'),
+...
+```
+
+Untuk menghubungkan form modal dengan path tersebut bisa diatur di script pada main.html
+```
+<script>
+    ...
+      function addItem() {
+        fetch("{% url 'main:add_item_ajax' %}", {
+          method: 'POST',
+          body: new FormData(document.querySelector('#form'))
+        }).then(refreshItems)
+
+        document.getElementById("form").reset()
+        return false
+      }
+    ...
+</script>
+```
+
+Halaman akan secara otomatis ter-reload setelah item ditambahkan karena adanya fungsi ```.then(refreshItems)```
+
+Untuk melakukan perintah collectstatic cukup jalankan kode ini di env
+```
+python manage.py collectstatic
+```
 <hr>
