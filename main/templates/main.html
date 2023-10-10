@@ -72,7 +72,36 @@
         </a> -->
 
         <div class="card-container row justify-content-md-center text-center"> 
-
+          {% for item in items %}
+          <div class="card col col-lg-4 mx-5 my-3" style="width: 18rem;">
+              <img src="..." class="card-img-top" alt="Gambar belum ada">
+              <div class="card-body">
+                  <h5 class="card-title">{{item.name}}</h5>
+                  <p>Amount:</p>
+                  <form action="{% url 'main:sub_amount' item.name %}" method="post" style="display: inline;">
+                      {% csrf_token %}
+                      <input id="sub_button" type="submit" value="-" class=""/>
+                  </form>
+                  {{item.amount}}
+                  <form action="{% url 'main:add_amount' item.name %}" method="post" style="display: inline;">
+                      {% csrf_token %}
+                      <input id="add_button" type="submit" value="+" />
+                  </form>
+                  <p class="card-text mt-3">Type: {{item.type}}</p>
+                  <p class="card-text">{{item.description}}</p>
+                  <p class="card-text">Date added: {{item.date_added}}</p>
+                  <a href="{% url 'main:edit_item' item.pk %}">
+                    <button>
+                      Edit
+                    </button>
+                  </a>
+                  <form action="{% url 'main:delete_item' item.name %}" method="post" style="display: inline;">
+                      {% csrf_token %}
+                      <button id="delete_button" type="submit">Delete</button>
+                  </form>
+              </div>
+          </div>
+          {% endfor %}
         </div>
 
         <p class="mt-5">
