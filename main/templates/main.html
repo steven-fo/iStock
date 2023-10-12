@@ -64,40 +64,115 @@
         <h6>Kamu menyimpan {{items.count}} item pada aplikasi ini</h6>
         <br>
 
-        <a href="{% url 'main:create_item' %}">
-            <button>
-                Add New Item
-            </button>
-        </a>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Item by AJAX</button>
 
-        <div class="card-container row justify-content-md-center"> 
-            {% for item in items %}
-            <div class="card col col-lg-4 mx-5 my-3 " style="width: 18rem;">
-                <img src="..." class="card-img-top" alt="Gambar belum ada">
-                <div class="card-body">
-                    <h5 class="card-title">{{item.name}}</h5>
-                    <p>Amount:</p>
-                    <form action="{% url 'main:sub_amount' item.name %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <input id="sub_button" type="submit" value="-" class=""/>
-                    </form>
-                    {{item.amount}}
-                    <form action="{% url 'main:add_amount' item.name %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <input id="add_button" type="submit" value="+" />
-                    </form>
-                    <p class="card-text mt-3">Type: {{item.type}}</p>
-                    <p class="card-text">{{item.description}}</p>
-                    <form action="{% url 'main:delete_item' item.name %}" method="post">
-                        {% csrf_token %}
-                        <button id="delete_button" type="submit">Delete</button>
-                    </form>
-                </div>
-            </div>
-            {% endfor %}
+        <div class="card-container row justify-content-md-center text-center" id="card-container"> 
+
         </div>
-        <p>
+
+        <p class="mt-5">
         Sesi terakhir login: {{ last_login }}
         </p>
     </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">Add New Item</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <form id="form" onsubmit="return false;">
+                      {% csrf_token %}
+                      <div class="mb-3">
+                          <label for="name" class="col-form-label">Name:</label>
+                          <input type="text" class="form-control" id="name" name="name"></input>
+                      </div>
+                      <div class="mb-3">
+                          <label for="amount" class="col-form-label">Amount:</label>
+                          <input type="number" class="form-control" id="amount" name="amount    "></input>
+                      </div>
+                      <div class="mb-3">
+                        <label for="type" class="col-form-label">Type:</label>
+                        <input type="text" class="form-control" id="type" name="type"></input>
+                      </div>
+                      <div class="mb-3">
+                          <label for="description" class="col-form-label">Description:</label>
+                          <textarea class="form-control" id="description" name="description"></textarea>
+                      </div>
+                  </form>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal">Add Product</button>
+              </div>
+          </div>
+      </div>
+    </div>
+
+    <script>
+      async function getItems() {
+        return fetch("{% url 'main:get_item_json' %}").then((res) => res.json())
+      }
+
+      async function refreshItems() {
+        document.getElementById("card-container").innerHTML = ""
+        const items = await getItems()
+        let htmlString = ""
+        items.forEach((item) => {
+          htmlString += `\n<div class="card col col-lg-4 mx-5 my-3" style="width: 18rem;">
+                <img src="..." class="card-img-top" alt="Gambar belum ada">
+                <div class="card-body">
+                    <h5 class="card-title">${item.fields.name}</h5>
+                    <p>Amount:</p>
+                    <a href="sub/${item.pk}">
+                        <input id="sub_button" type="submit" value="-" class=""/>
+                    </a>
+                    ${item.fields.amount}
+                    <a href="add/${item.pk}/">
+                        <input id="add_button" type="submit" value="+" />
+                    </a>
+                    <p class="card-text mt-3">Type: ${item.fields.type}</p>
+                    <p class="card-text">${item.fields.description}</p>
+                    <p class="card-text">Date added: ${item.fields.date_added}</p>
+                    <a href="edit-item/${item.pk}/">
+                      <button>
+                        Edit
+                      </button>
+                    </a>
+                    <a href="delete/${item.pk}/">
+                      <button>
+                        Delete
+                      </button>
+                    </a>
+                    <button type="button" class="btn btn-primary" id="button_delete" onclick="deleteItem(${item.pk}); return false;">Delete Item by AJAX</button>
+                </div>
+            </div>`
+        })
+        document.getElementById("card-container").innerHTML = htmlString;
+      }
+
+      refreshItems()
+
+      function addItem() {
+        fetch("{% url 'main:add_item_ajax' %}", {
+          method: "POST",
+          body: new FormData(document.querySelector('#form'))
+        }).then(refreshItems)
+
+        document.getElementById("form").reset()
+        return false
+      }
+
+      function deleteItem(itemId) {
+        fetch(`delete-item-ajax/${itemId}`, {
+          method:"DELETE"
+        }).then(refreshItems)
+        return false
+      }
+
+      document.getElementById("button_add").onclick = addItem
+      document.getElementById("button_delete").onclick = deleteItem
+    </script>
 {% endblock content %}

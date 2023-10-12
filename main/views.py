@@ -1,6 +1,6 @@
 import datetime
 from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseNotFound, HttpResponseRedirect, HttpResponse
 from main.forms import ItemForm
 from django.urls import reverse
 from main.models import Item
@@ -9,6 +9,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 
 @login_required(login_url='/login')
 def show_main(request):
@@ -90,22 +91,61 @@ def logout_user(request):
     response.delete_cookie('last_login')
     return redirect('main:login')
 
-def add_amount(request, item_name):
-    item = Item.objects.get(name=item_name)
+def add_amount(request, id):
+    item = Item.objects.get(pk = id)
     item.amount += 1
     item.save()
-    return redirect('/')
+    return HttpResponseRedirect(reverse('main:show_main'))
 
-def sub_amount(request, item_name):
-    item = Item.objects.get(name=item_name)
+def sub_amount(request, id):
+    item = Item.objects.get(pk = id)
     if item.amount == 0:
         item.amount = 0
     else:
         item.amount -= 1
     item.save()
-    return redirect('/')
+    return HttpResponseRedirect(reverse('main:show_main'))
 
-def delete_item(request, item_name):
-    item = Item.objects.get(name=item_name)
+def delete_item(request, id):
+    item = Item.objects.get(pk = id)
     item.delete()
-    return redirect('/')
+    return HttpResponseRedirect(reverse('main:show_main'))
+
+def edit_item(request, id):
+    item = Item.objects.get(pk = id)
+    form = ItemForm(request.POST or None, instance=item)
+
+    if form.is_valid() and request.method == "POST":
+        form.save()
+        return HttpResponseRedirect(reverse('main:show_main'))
+
+    context = {'form': form}
+    return render(request, "edit_item.html", context)
+
+def get_item_json(request):
+    item = Item.objects.filter(user=request.user)
+    return HttpResponse(serializers.serialize('json', item))
+
+@csrf_exempt
+def add_item_ajax(request):
+    if request.method == 'POST':
+        name = request.POST.get("name")
+        amount = request.POST.get("amount")
+        type = request.POST.get("type")
+        description = request.POST.get("description")
+        user = request.user
+    
+        new_item = Item(name=name, amount=amount, type=type, description=description, user=user)
+        new_item.save()
+
+        return HttpResponse(b"CREATED", status=201)
+    
+    return HttpResponseNotFound()
+
+@csrf_exempt
+def delete_item_ajax(request, id):
+    if request.method == 'DELETE':
+        item = Item.objects.get(pk=id)
+        item.delete()
+        return HttpResponse(b"DELETED", status=200)
+    return HttpResponseNotFound()
