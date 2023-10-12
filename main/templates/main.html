@@ -65,43 +65,9 @@
         <br>
 
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add Item by AJAX</button>
-        <!-- <a href="{% url 'main:create_item' %}">
-            <button class="mb-5">
-                Add New Item
-            </button>
-        </a> -->
 
-        <div class="card-container row justify-content-md-center text-center"> 
-          {% for item in items %}
-          <div class="card col col-lg-4 mx-5 my-3" style="width: 18rem;">
-              <img src="..." class="card-img-top" alt="Gambar belum ada">
-              <div class="card-body">
-                  <h5 class="card-title">{{item.name}}</h5>
-                  <p>Amount:</p>
-                  <form action="{% url 'main:sub_amount' item.name %}" method="post" style="display: inline;">
-                      {% csrf_token %}
-                      <input id="sub_button" type="submit" value="-" class=""/>
-                  </form>
-                  {{item.amount}}
-                  <form action="{% url 'main:add_amount' item.name %}" method="post" style="display: inline;">
-                      {% csrf_token %}
-                      <input id="add_button" type="submit" value="+" />
-                  </form>
-                  <p class="card-text mt-3">Type: {{item.type}}</p>
-                  <p class="card-text">{{item.description}}</p>
-                  <p class="card-text">Date added: {{item.date_added}}</p>
-                  <a href="{% url 'main:edit_item' item.pk %}">
-                    <button>
-                      Edit
-                    </button>
-                  </a>
-                  <form action="{% url 'main:delete_item' item.name %}" method="post" style="display: inline;">
-                      {% csrf_token %}
-                      <button id="delete_button" type="submit">Delete</button>
-                  </form>
-              </div>
-          </div>
-          {% endfor %}
+        <div class="card-container row justify-content-md-center text-center" id="card-container"> 
+
         </div>
 
         <p class="mt-5">
@@ -124,8 +90,8 @@
                           <input type="text" class="form-control" id="name" name="name"></input>
                       </div>
                       <div class="mb-3">
-                          <label for="price" class="col-form-label">Amount:</label>
-                          <input type="number" class="form-control" id="price" name="price"></input>
+                          <label for="amount" class="col-form-label">Amount:</label>
+                          <input type="number" class="form-control" id="amount" name="amount    "></input>
                       </div>
                       <div class="mb-3">
                         <label for="type" class="col-form-label">Type:</label>
@@ -153,34 +119,34 @@
       async function refreshItems() {
         document.getElementById("card-container").innerHTML = ""
         const items = await getItems()
+        let htmlString = ""
         items.forEach((item) => {
-          htmlString = `\n<div class="card col col-lg-4 mx-5 my-3" style="width: 18rem;">
+          htmlString += `\n<div class="card col col-lg-4 mx-5 my-3" style="width: 18rem;">
                 <img src="..." class="card-img-top" alt="Gambar belum ada">
                 <div class="card-body">
-                    <h5 class="card-title">{{item.name}}</h5>
+                    <h5 class="card-title">${item.fields.name}</h5>
                     <p>Amount:</p>
-                    <form action="{% url 'main:sub_amount' ${item.pk} %}" method="post" style="display: inline;">
-                        {% csrf_token %}
+                    <a href="sub/${item.pk}">
                         <input id="sub_button" type="submit" value="-" class=""/>
-                    </form>
-                    {{item.amount}}
-                    <form action="{% url 'main:add_amount' ${item.pk} %}" method="post" style="display: inline;">
-                        {% csrf_token %}
+                    </a>
+                    ${item.fields.amount}
+                    <a href="add/${item.pk}/">
                         <input id="add_button" type="submit" value="+" />
-                    </form>
-                    <p class="card-text mt-3">Type: {{item.type}}</p>
-                    <p class="card-text">{{item.description}}</p>
-                    <p class="card-text">Date added: {{item.date_added}}</p>
-                    <a href="{% url 'main:edit_item' ${item.pk} %}">
+                    </a>
+                    <p class="card-text mt-3">Type: ${item.fields.type}</p>
+                    <p class="card-text">${item.fields.description}</p>
+                    <p class="card-text">Date added: ${item.fields.date_added}</p>
+                    <a href="edit-item/${item.pk}/">
                       <button>
                         Edit
                       </button>
                     </a>
-                    <form action="{% url 'main:delete_item' ${item.pk} %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <button id="delete_button" type="submit">Delete</button>
-                    </form>
-                    <button type="button" class="btn btn-primary" id="button_delete">Delete Item by AJAX</button>
+                    <a href="delete/${item.pk}/">
+                      <button>
+                        Delete
+                      </button>
+                    </a>
+                    <button type="button" class="btn btn-primary" id="button_delete" onclick="deleteItem(${item.pk}); return false;">Delete Item by AJAX</button>
                 </div>
             </div>`
         })
@@ -191,7 +157,7 @@
 
       function addItem() {
         fetch("{% url 'main:add_item_ajax' %}", {
-          method: 'POST',
+          method: "POST",
           body: new FormData(document.querySelector('#form'))
         }).then(refreshItems)
 
@@ -199,9 +165,9 @@
         return false
       }
 
-      function deleteItem() {
-        fetch("{% url 'main:delete_item_ajax' item.pk %}", {
-          method:'DELETE'
+      function deleteItem(itemId) {
+        fetch(`delete-item-ajax/${itemId}`, {
+          method:"DELETE"
         }).then(refreshItems)
         return false
       }

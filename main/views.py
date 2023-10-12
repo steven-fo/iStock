@@ -95,7 +95,7 @@ def add_amount(request, id):
     item = Item.objects.get(pk = id)
     item.amount += 1
     item.save()
-    return redirect('/')
+    return HttpResponseRedirect(reverse('main:show_main'))
 
 def sub_amount(request, id):
     item = Item.objects.get(pk = id)
@@ -104,12 +104,12 @@ def sub_amount(request, id):
     else:
         item.amount -= 1
     item.save()
-    return redirect('/')
+    return HttpResponseRedirect(reverse('main:show_main'))
 
 def delete_item(request, id):
     item = Item.objects.get(pk = id)
     item.delete()
-    return redirect('/')
+    return HttpResponseRedirect(reverse('main:show_main'))
 
 def edit_item(request, id):
     item = Item.objects.get(pk = id)
@@ -123,7 +123,7 @@ def edit_item(request, id):
     return render(request, "edit_item.html", context)
 
 def get_item_json(request):
-    item = Item.objects.all()
+    item = Item.objects.filter(user=request.user)
     return HttpResponse(serializers.serialize('json', item))
 
 @csrf_exempt
