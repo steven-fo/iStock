@@ -35,7 +35,7 @@ def logout(request):
     username = request.user.username
 
     try:
-        auth_logout(username)
+        auth_logout(request)
         return JsonResponse({
             "username": username,
             "status": True,
