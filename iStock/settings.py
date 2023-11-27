@@ -125,6 +125,8 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SAMESITE = 'None'
 
+CSRF_TRUSTED_ORIGINS = ["https://steven-faustin-tugas.pbp.cs.ui.ac.id"]
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
